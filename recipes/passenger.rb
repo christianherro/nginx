@@ -23,14 +23,27 @@ packages = value_for_platform_family(
   %w(debian) => node['nginx']['passenger']['packages']['debian']
 )
 
-template '/etc/apt/sources.list.d/passenger.list' do
-  source 'sources_list_d.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
+if %w(debian ubuntu).include?(node['platform'])
+  template '/etc/apt/sources.list.d/passenger.list' do
+    source 'sources_list_d.erb'
+    owner 'root'
+    group 'root'
+    mode '0644'
+  end
+  
+  prereq_packages = %w{ dirmngr gnupg apt-transport-https ca-certificates }
+  prereq_packages.each do |prereq_package|
+    package prereq_package
+  end
+
+  execute 'add key for phusion passenger repo' do
+    command "apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7"
+  end
+
+  apt_update 'update' do
+  end.run_action(:update) if platform_family?('debian')
 end
 
-include_recipe "apt::default"
 
 package packages unless packages.empty?
 
