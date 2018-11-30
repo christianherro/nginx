@@ -23,6 +23,15 @@ packages = value_for_platform_family(
   %w(debian) => node['nginx']['passenger']['packages']['debian']
 )
 
+template '/etc/apt/sources.list.d/passenger.list' do
+  source 'templates/ubuntu/sources_list_d.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
+include_recipe "apt::default"
+
 package packages unless packages.empty?
 
 gem_package 'rake' if node['nginx']['passenger']['install_rake']
