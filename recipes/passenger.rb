@@ -24,7 +24,7 @@ packages = value_for_platform_family(
 )
 
 template '/etc/apt/sources.list.d/passenger.list' do
-  source 'templates/ubuntu/sources_list_d.erb'
+  source 'sources_list_d.erb'
   owner 'root'
   group 'root'
   mode '0644'
